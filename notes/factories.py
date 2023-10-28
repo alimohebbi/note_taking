@@ -1,15 +1,27 @@
 import factory
 from django.contrib.auth.models import User
 from django.forms import model_to_dict
+from factory import fuzzy
 
 from notes.models import Note
+
+
+class UniqueUsernameProvider(factory.faker.Faker):
+    def unique_username(self):
+        username = factory.fuzzy.FuzzyText(length=10).fuzz()
+        while User.objects.filter(username=username).exists():
+            username = factory.fuzzy.FuzzyText(length=10).fuzz()
+        return username
+
+
+factory.Faker.add_provider(UniqueUsernameProvider)
 
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
 
-    username = factory.Faker('user_name')
+    username = factory.Faker('unique_username')
     password = factory.Faker('password')
     email = factory.Faker('email')
 

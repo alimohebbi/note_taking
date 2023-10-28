@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from notes.factories import NoteFactory, note_data_generator
+from notes.models import Note
 
 
 class NoteAPITest(TestCase):
@@ -19,14 +20,18 @@ class NoteAPITest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        NoteFactory.create_batch(50)
         self.note = NoteFactory.create()
         self.user = self.note.user
 
     def test_get_list_successful(self):
+        NoteFactory.create_batch(size=50, user=self.user)
         self.authenticate(self.user)
         url = reverse('note_list')
         response = self.client.get(url)
+        user_notes_number = Note.objects.filter(user = self.user).count()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), user_notes_number)
 
     def test_get_list_successful_unauthorized_error(self):
         url = reverse('note_list')
@@ -37,8 +42,11 @@ class NoteAPITest(TestCase):
         self.authenticate(self.user)
         new_note_data = note_data_generator()
         url = reverse('note_list')
+        user_notes_number_before = Note.objects.filter(user=self.user).count()
         response = self.client.post(url, new_note_data)
+        user_notes_number_after = Note.objects.filter(user=self.user).count()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(user_notes_number_after, user_notes_number_before + 1)
 
     def test_post_note_validation_error(self):
         self.authenticate(self.user)
@@ -62,6 +70,9 @@ class NoteAPITest(TestCase):
         url = reverse('note_detail', args=[self.note.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['user'], self.note.user.id)
+        self.assertEqual(response.data['title'], self.note.title)
+        self.assertEqual(response.data['description'], self.note.description)
 
     def test_get_detail_unauthorized_error(self):
         url = reverse('note_detail', args=[self.note.id])
