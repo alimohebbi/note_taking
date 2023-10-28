@@ -30,11 +30,19 @@ class NoteDetail(APIView):
 
     def get(self, request, pk):
         note = get_object_or_404(Note, pk=pk)
+        if note.user != request.user:
+            return Response({"detail": "You do not have permission to access this note."},
+                            status=status.HTTP_403_FORBIDDEN)
+
         serializer = NoteSerializer(note)
         return Response(serializer.data)
 
     def put(self, request, pk):
         note = get_object_or_404(Note, pk=pk)
+        if note.user != request.user:
+            return Response({"detail": "You do not have permission to modify this note."},
+                            status=status.HTTP_403_FORBIDDEN)
+
         serializer = NoteSerializer(note, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -43,5 +51,9 @@ class NoteDetail(APIView):
 
     def delete(self, request, pk):
         note = get_object_or_404(Note, pk=pk)
+        if note.user != request.user:
+            return Response({"detail": "You do not have permission to delete this note."},
+                            status=status.HTTP_403_FORBIDDEN)
+
         note.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
