@@ -27,11 +27,11 @@ class NoteAPITest(TestCase):
     def test_get_list_successful(self):
         NoteFactory.create_batch(size=50, user=self.user)
         self.authenticate(self.user)
-        url = reverse('note_list')
+        url = reverse('note_list') + f'?page=2&page_size=8'
         response = self.client.get(url)
-        user_notes_number = Note.objects.filter(user = self.user).count()
+        user_notes_number = Note.objects.filter(user=self.user).count()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), user_notes_number)
+        self.assertEqual(len(response.data['results']), 8)
 
     def test_get_list_successful_unauthorized_error(self):
         url = reverse('note_list')
@@ -70,7 +70,7 @@ class NoteAPITest(TestCase):
         url = reverse('note_detail', args=[self.note.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['user'], self.note.user.id)
+        self.assertEqual(response.data['id'], self.note.id)
         self.assertEqual(response.data['title'], self.note.title)
         self.assertEqual(response.data['description'], self.note.description)
 

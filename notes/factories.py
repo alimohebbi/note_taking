@@ -49,3 +49,5 @@ def user_data_generator():
     new_user_data.pop('id')
     new_user_data.pop('last_login')
     return new_user_data
+
+
