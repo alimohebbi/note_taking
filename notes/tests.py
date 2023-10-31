@@ -1,4 +1,5 @@
-from django.contrib.auth.models import User
+import uuid
+
 from django.test import TestCase
 from django.urls import reverse
 from faker import Faker
@@ -7,8 +8,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from notes.factories import NoteFactory, note_data_generator
-from notes.models import Note
+from notes.models import Note, User
 
+OBJECTS_BATCH_SIZE = 22
 
 class NoteAPITest(TestCase):
     def authenticate(self, user):
@@ -20,12 +22,12 @@ class NoteAPITest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        NoteFactory.create_batch(50)
+        NoteFactory.create_batch(OBJECTS_BATCH_SIZE)
         self.note = NoteFactory.create()
         self.user = self.note.user
 
     def test_get_list_successful(self):
-        NoteFactory.create_batch(size=50, user=self.user)
+        NoteFactory.create_batch(size=OBJECTS_BATCH_SIZE, user=self.user)
         self.authenticate(self.user)
         url = reverse('note_list') + f'?page=2&page_size=8'
         response = self.client.get(url)
@@ -81,7 +83,7 @@ class NoteAPITest(TestCase):
         url = reverse('note_detail', args=[self.note.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['id'], self.note.id)
+        self.assertEqual(response.data['id'], str(self.note.id))
         self.assertEqual(response.data['title'], self.note.title)
         self.assertEqual(response.data['content'], self.note.content)
 
@@ -99,7 +101,7 @@ class NoteAPITest(TestCase):
 
     def test_get_detail_not_found_error(self):
         self.authenticate(self.user)
-        url = reverse('note_detail', args=[9999])
+        url = reverse('note_detail', args=[uuid.uuid4()])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -123,7 +125,7 @@ class NoteAPITest(TestCase):
 
     def test_get_delete_not_found_error(self):
         self.authenticate(self.user)
-        url = reverse('note_detail', args=[9999])
+        url = reverse('note_detail', args=[uuid.uuid4()])
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -161,7 +163,7 @@ class NoteAPITest(TestCase):
 
     def test_put_detail_not_found_error(self):
         self.authenticate(self.user)
-        url = reverse('note_detail', args=[9999])
+        url = reverse('note_detail', args=[uuid.uuid4()])
         new_data = note_data_generator()
         response = self.client.put(url, new_data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
