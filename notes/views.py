@@ -13,7 +13,7 @@ class NoteList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        query_set = Note.objects.filter(user=request.user)
+        query_set = Note.objects.filter(user=request.user).order_by('-created_at')
         paginator = CustomPagination()
         paginated_query = paginator.paginate_queryset(query_set, request)
         serializer = ListNoteSerializer(paginated_query, many=True)
