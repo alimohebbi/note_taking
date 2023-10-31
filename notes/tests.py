@@ -29,7 +29,6 @@ class NoteAPITest(TestCase):
         self.authenticate(self.user)
         url = reverse('note_list') + f'?page=2&page_size=8'
         response = self.client.get(url)
-        user_notes_number = Note.objects.filter(user=self.user).count()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 8)
 
@@ -38,9 +37,18 @@ class NoteAPITest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_post_note_successful(self):
+    def test_post_idea_successful(self):
+        self.post_note_successful('I')
+
+    def test_post_reminder_successful(self):
+        self.post_note_successful('R')
+
+    def test_post_thought_successful(self):
+        self.post_note_successful('T')
+
+    def post_note_successful(self, note_type):
         self.authenticate(self.user)
-        new_note_data = note_data_generator()
+        new_note_data = note_data_generator(note_type)
         url = reverse('note_list')
         user_notes_number_before = Note.objects.filter(user=self.user).count()
         response = self.client.post(url, new_note_data)
@@ -52,10 +60,13 @@ class NoteAPITest(TestCase):
         self.authenticate(self.user)
         faker = Faker()
         url = reverse('note_list')
-        new_note = {'description': faker.sentence(nb_words=3)}
+        new_note = {'content': faker.sentence(nb_words=3), 'note_type': 'I'}
         response = self.client.post(url, new_note)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        new_note = {'title': faker.sentence(nb_words=3)}
+        new_note = {'title': faker.sentence(nb_words=3), 'note_type': 'I'}
+        response = self.client.post(url, new_note)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        new_note = {'title': faker.sentence(nb_words=3), 'note_type': 'R', 'content': faker.sentence(nb_words=3)}
         response = self.client.post(url, new_note)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -72,7 +83,7 @@ class NoteAPITest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.note.id)
         self.assertEqual(response.data['title'], self.note.title)
-        self.assertEqual(response.data['description'], self.note.description)
+        self.assertEqual(response.data['content'], self.note.content)
 
     def test_get_detail_unauthorized_error(self):
         url = reverse('note_detail', args=[self.note.id])

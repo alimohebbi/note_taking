@@ -17,13 +17,7 @@ class NoteList(APIView):
         paginator = CustomPagination()
         paginated_query = paginator.paginate_queryset(query_set, request)
         serializer = ListNoteSerializer(paginated_query, many=True)
-        return Response(paginator.get_paginated_response(serializer))
-    #
-    # def get(self, request):
-    #     query_set = Note.objects.filter(user=request.user)
-    #     paginated_query = CustomPagination().paginate_queryset(query_set, request)
-    #     serializer = ListNoteSerializer(paginated_query, many=True)
-    #     return Response(serializer.data)
+        return Response(paginator.get_paginated_response(serializer.data))
 
     def post(self, request):
         serializer = NoteSerializer(data=request.data)

@@ -1,7 +1,8 @@
 import factory
 from django.contrib.auth.models import User
 from django.forms import model_to_dict
-from factory import fuzzy
+from django.utils import timezone
+from factory import fuzzy, Faker
 
 from notes.models import Note
 
@@ -30,13 +31,29 @@ class NoteFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Note
 
+    note_type = Faker('random_element', elements=[choice[0] for choice in Note.NOTE_TYPE])
+
     title = factory.Faker('sentence', nb_words=3)
-    description = factory.Faker('text', max_nb_chars=200)
+    content = factory.Faker('text', max_nb_chars=200)
     user = factory.SubFactory(UserFactory)
+    created_at = factory.LazyFunction(timezone.now)
+    updated_at = factory.Faker('date_time_this_decade', before_now=True, after_now=True, tzinfo=timezone.utc)
+    remind_at = factory.Faker('date_time_this_decade', before_now=False, after_now=True, tzinfo=timezone.utc)
+
+    @factory.post_generation
+    def set_remind_at(obj, create, extracted, **kwargs):
+        if obj.note_type == 'R':
+            obj.reminder_at = factory.Faker('date_time_this_decade', before_now=False, after_now=True,
+                                            tzinfo=timezone.utc)
+        else:
+            obj.reminder_at = None
 
 
-def note_data_generator():
-    note_stub = NoteFactory.build()
+def note_data_generator(note_type=None):
+    if note_type:
+        note_stub = NoteFactory.build(note_type=note_type)
+    else:
+        note_stub = NoteFactory.build()
     new_note_data = model_to_dict(note_stub)
     new_note_data.pop('id')
     new_note_data.pop('user')
@@ -49,5 +66,3 @@ def user_data_generator():
     new_user_data.pop('id')
     new_user_data.pop('last_login')
     return new_user_data
-
-
