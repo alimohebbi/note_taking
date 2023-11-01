@@ -5,7 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from notes.factories import user_data_generator, UserFactory
-OBJECTS_BATCH_SIZE = 2000
+OBJECTS_BATCH_SIZE = 50
 
 
 class AccountAPITest(TestCase):

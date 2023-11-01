@@ -71,7 +71,6 @@ TEMPLATES = [
 
 AUTH_USER_MODEL = 'notes.User'
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
@@ -85,47 +84,18 @@ WSGI_APPLICATION = 'note_taking.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'notes-djongo-db',  # Name of your MongoDB database
-        'ENFORCE_SCHEMA': True,
-        'CLIENT': {
-            'host': '127.0.0.1',
-            'port': 27017,
-            'username': 'root',
-            'password': 'password',
-            'authSource': 'admin'
-        },
-        'TEST': {
-            'NAME': 'note-tests',
-        }
-    },
-
-    'test': {
-        'ENGINE': 'djongo',
-        'NAME': 'notes-test-djongo-db',  # Name of your MongoDB database
-        'ENFORCE_SCHEMA': True,
-        'CLIENT': {
-            'host': '127.0.0.1',
-            'port': 27017,
-            'username': 'root',
-            'password': 'password',
-            'authSource': 'admin'
-        }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'note-db',
+        'USER': 'note-admin',
+        'PASSWORD': 'dENgczA44IsDn',
+        'HOST': 'localhost',  # Set to the host where your PostgreSQL server is running.
+        'PORT': '',  # Leave it as an empty string for the default PostgreSQL port (5432).
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'init',
-#         'USER': 'root',
-#         'PASSWORD': 'admin',
-#         'HOST': 'localhost',  # Set to the host where your PostgreSQL server is running.
-#         'PORT': '',  # Leave it as an empty string for the default PostgreSQL port (5432).
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -156,13 +126,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

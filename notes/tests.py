@@ -10,7 +10,8 @@ from rest_framework.test import APIClient
 from notes.factories import NoteFactory, note_data_generator
 from notes.models import Note, User
 
-OBJECTS_BATCH_SIZE = 200
+OBJECTS_BATCH_SIZE = 50
+
 
 class NoteAPITest(TestCase):
     def authenticate(self, user):
