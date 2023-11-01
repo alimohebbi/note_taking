@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import Note
+from .models import Note, SharedNote
 
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['title', 'content', '_id', 'remind_at', 'note_type', 'created_at']
+        fields = ['title', 'content', 'note_id', 'remind_at', 'note_type', 'created_at']
         extra_kwargs = {'user': {'required': False}}
 
     def validate_note_type(self, value):
@@ -18,4 +18,18 @@ class NoteSerializer(serializers.ModelSerializer):
 class ListNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['title', '_id', 'created_at']
+        fields = ['title', 'note_id', 'created_at']
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class NoteIdSerializer(serializers.Serializer):
+    note_id = serializers.UUIDField()
+
+
+class SharedNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SharedNote
+        fields = ['note', 'recipient']
