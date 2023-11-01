@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+from config_vars import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-i900b-3!gs6gy2s0b)c3c8x@5t2a(7gryv72v1dd%)wrt&!6s4'
+SECRET_KEY = Credentials.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,16 +87,7 @@ WSGI_APPLICATION = 'note_taking.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'note-db',
-        'USER': 'note-admin',
-        'PASSWORD': 'dENgczA44IsDn',
-        'HOST': 'localhost',  # Set to the host where your PostgreSQL server is running.
-        'PORT': '',  # Leave it as an empty string for the default PostgreSQL port (5432).
-    }
-}
+DATABASES = DataBase.database_info
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.messages import NoteMessages
 from common.pagination import CustomPagination
 from notes.models import Note
 from notes.serializers import NoteSerializer, ListNoteSerializer
@@ -33,8 +34,7 @@ class NoteDetail(APIView):
     def get(self, request, pk):
         note = get_object_or_404(Note, pk=pk)
         if note.user != request.user:
-            return Response({"detail": "You do not have permission to access this note."},
-                            status=status.HTTP_403_FORBIDDEN)
+            return Response(NoteMessages.FORBIDDEN_ACCESS, status=status.HTTP_403_FORBIDDEN)
 
         serializer = NoteSerializer(note)
         return Response(serializer.data)
@@ -42,8 +42,7 @@ class NoteDetail(APIView):
     def put(self, request, pk):
         note = get_object_or_404(Note, pk=pk)
         if note.user != request.user:
-            return Response({"detail": "You do not have permission to modify this note."},
-                            status=status.HTTP_403_FORBIDDEN)
+            return Response(NoteMessages.FORBIDDEN_MODIFY, status=status.HTTP_403_FORBIDDEN)
 
         serializer = NoteSerializer(note, data=request.data)
         if serializer.is_valid():
@@ -54,8 +53,7 @@ class NoteDetail(APIView):
     def delete(self, request, pk):
         note = get_object_or_404(Note, pk=pk)
         if note.user != request.user:
-            return Response({"detail": "You do not have permission to delete this note."},
-                            status=status.HTTP_403_FORBIDDEN)
+            return Response(NoteMessages.FORBIDDEN_DELETE, status=status.HTTP_403_FORBIDDEN)
 
         note.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
