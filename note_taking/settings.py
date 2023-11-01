@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from . import config_vars
+import os
+import logging
+from logging.handlers import RotatingFileHandler
+import os
+import logging
+from logging.handlers import RotatingFileHandler
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,6 +59,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'note_taking.urls'
+AUTH_USER_MODEL = 'account.User'
 
 TEMPLATES = [
     {
@@ -70,8 +77,6 @@ TEMPLATES = [
     },
 ]
 
-AUTH_USER_MODEL = 'account.User'
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
@@ -88,6 +93,8 @@ WSGI_APPLICATION = 'note_taking.wsgi.application'
 
 
 DATABASES = config_vars.database_info
+
+LOGGING = config_vars.logging_conf
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -122,7 +129,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

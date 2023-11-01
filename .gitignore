@@ -6,3 +6,4 @@ migrations
 .coverage
 static
 **/__pycache__/
+logs/*.log
