@@ -1,13 +1,18 @@
-from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+import uuid
+from django.contrib.auth.models import AbstractUser
+
+
+class User(AbstractUser):
+    _id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
 
 class Note(models.Model):
     NOTE_TYPE = [('I', 'Idea'),
                  ('T', 'Thought'),
                  ('R', 'Reminder')]
-
+    _id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     note_type = models.CharField(max_length=1, choices=NOTE_TYPE, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
     title = models.CharField(max_length=200)

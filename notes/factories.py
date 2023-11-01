@@ -1,10 +1,9 @@
 import factory
-from django.contrib.auth.models import User
 from django.forms import model_to_dict
 from django.utils import timezone
 from factory import fuzzy, Faker
 
-from notes.models import Note
+from notes.models import Note, User
 
 
 class UniqueUsernameProvider(factory.faker.Faker):
@@ -55,7 +54,6 @@ def note_data_generator(note_type=None):
     else:
         note_stub = NoteFactory.build()
     new_note_data = model_to_dict(note_stub)
-    new_note_data.pop('id')
     new_note_data.pop('user')
     return new_note_data
 
@@ -63,6 +61,5 @@ def note_data_generator(note_type=None):
 def user_data_generator():
     user_obj = UserFactory.build()
     new_user_data = model_to_dict(user_obj)
-    new_user_data.pop('id')
     new_user_data.pop('last_login')
     return new_user_data
