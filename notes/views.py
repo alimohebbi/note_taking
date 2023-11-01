@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status
@@ -8,9 +10,16 @@ from rest_framework.views import APIView
 from account.serializers import UserSerializer
 from common.messages import NoteMessages
 from common.pagination import CustomPagination
+from common.util import is_vali_uuid
 from notes.models import Note, SharedNote, User
-from notes.serializers import NoteSerializer, ListNoteSerializer, EmailSerializer, SharedNoteSerializer, NoteIdSerializer
+from notes.serializers import NoteSerializer, ListNoteSerializer, EmailSerializer, SharedNoteSerializer, \
+    NoteIdSerializer
 
+
+def get_note_or_404(note_id) -> Note:
+    if not is_vali_uuid(note_id):
+        raise Http404(NoteMessages.NOT_FOUND)
+    return get_object_or_404(Note, pk=note_id)
 
 class NoteList(APIView):
     permission_classes = [IsAuthenticated]
@@ -34,7 +43,7 @@ class NoteDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, note_id):
-        note = get_object_or_404(Note, pk=note_id)
+        note = get_note_or_404(note_id)
         if note.user != request.user:
             return Response(NoteMessages.FORBIDDEN_ACCESS, status=status.HTTP_403_FORBIDDEN)
 
@@ -42,19 +51,19 @@ class NoteDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, note_id):
-        note = get_object_or_404(Note, pk=note_id)
+        note = get_note_or_404(note_id)
         if note.user != request.user:
             return Response(NoteMessages.FORBIDDEN_MODIFY, status=status.HTTP_403_FORBIDDEN)
 
         serializer = NoteSerializer(note, data=request.data)
         if serializer.is_valid():
-            note.updated_at = str(timezone.now)
+            note.updated_at = str(timezone.now().strftime("%Y-%m-%d %H:%M:%S%z"))
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, note_id):
-        note = get_object_or_404(Note, pk=note_id)
+        note = get_note_or_404(note_id)
         if note.user != request.user:
             return Response(NoteMessages.FORBIDDEN_DELETE, status=status.HTTP_403_FORBIDDEN)
 
@@ -66,7 +75,7 @@ class ShareNoteWithDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, note_id):
-        note = get_object_or_404(Note, pk=note_id)
+        note = get_note_or_404(note_id)
         if note.user != request.user:
             return Response(NoteMessages.FORBIDDEN_MODIFY, status=status.HTTP_403_FORBIDDEN)
 
@@ -77,30 +86,31 @@ class ShareNoteWithDetail(APIView):
         return Response(paginator.get_paginated_response(serializer.data))
 
     def post(self, request, note_id):
-        email_serializer = EmailSerializer(data=request.data)
-
-        note = get_object_or_404(Note, pk=note_id)
+        note = get_note_or_404(note_id)
         if note.user != request.user:
             return Response(NoteMessages.FORBIDDEN_MODIFY, status=status.HTTP_403_FORBIDDEN)
+        email_serializer = EmailSerializer(data=request.data)
 
         if email_serializer.is_valid():
             user = get_object_or_404(User, email=email_serializer.validated_data.get('email'))
-            shared_note = SharedNote(recipient=user, note=note)
+            shared_note = SharedNote(recipient_user=user, note=note)
             shared_note.save()
             shared_note_serializer = SharedNoteSerializer(instance=shared_note)
             return Response(shared_note_serializer.data, status=status.HTTP_201_CREATED)
         return Response(email_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
     def delete(self, request, note_id):
         email_serializer = EmailSerializer(data=request.data)
 
-        note = get_object_or_404(Note, pk=note_id)
+        note = get_note_or_404(note_id)
         if note.user != request.user:
             return Response(NoteMessages.FORBIDDEN_MODIFY, status=status.HTTP_403_FORBIDDEN)
 
         if email_serializer.is_valid():
             user = get_object_or_404(User, email=email_serializer.validated_data.get('email'))
-            SharedNote.objects.filter(recipient=user, note=note).delete()
+            SharedNote.objects.filter(recipient_user=user, note=note).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(email_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -109,7 +119,7 @@ class SharedNoteWithMeDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        query_set = Note.objects.filter(sharednote__recipient=request.user).order_by('-sharednote__created_at')
+        query_set = Note.objects.filter(sharednote__recipient_user=request.user).order_by('-sharednote__created_at')
         paginator = CustomPagination()
         paginated_query = paginator.paginate_queryset(query_set, request)
         serializer = ListNoteSerializer(paginated_query, many=True)
@@ -119,6 +129,6 @@ class SharedNoteWithMeDetail(APIView):
         note_id_serializer = NoteIdSerializer(data=request.data)
         if note_id_serializer.is_valid():
             note = get_object_or_404(Note, pk=note_id_serializer.data['note_id'])
-            SharedNote.objects.filter(recipient=request.user, note=note).delete()
+            SharedNote.objects.filter(recipient_user=request.user, note=note).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(note_id_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -32,4 +32,4 @@ class NoteIdSerializer(serializers.Serializer):
 class SharedNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = SharedNote
-        fields = ['note', 'recipient']
+        fields = ['note', 'recipient_user']

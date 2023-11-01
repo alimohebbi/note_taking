@@ -1,11 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 import uuid
 from django.contrib.auth.models import AbstractUser
 
-
-class User(AbstractUser):
-    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+User = get_user_model()
 
 
 class Note(models.Model):
@@ -28,9 +27,8 @@ class Note(models.Model):
 
 class SharedNote(models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE, db_index=True)
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
+    recipient_user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
     created_at = models.DateTimeField("create date", default=timezone.now, db_index=True)
 
-
     def __str__(self):
-        return f'Note "{self.note.title}" shared with user "{self.recipient.username}"'
+        return f'Note "{self.note.title}" shared with user "{self.recipient_user.username}"'

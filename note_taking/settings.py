@@ -70,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-AUTH_USER_MODEL = 'notes.User'
+AUTH_USER_MODEL = 'account.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

@@ -10,3 +10,5 @@ database_info = {
         'PORT': '',  # Leave it as an empty string for the default PostgreSQL port (5432).
     }
 }
+
+OBJECTS_BATCH_SIZE = 17

@@ -3,7 +3,7 @@ from django.forms import model_to_dict
 from django.utils import timezone
 from factory import fuzzy, Faker
 
-from notes.models import Note, User
+from notes.models import Note, User, SharedNote
 
 
 class UniqueUsernameProvider(factory.faker.Faker):
@@ -46,6 +46,15 @@ class NoteFactory(factory.django.DjangoModelFactory):
                                             tzinfo=timezone.utc)
         else:
             obj.reminder_at = None
+
+
+class SharedNoteFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = SharedNote
+
+    note = factory.SubFactory(NoteFactory)
+    recipient_user = factory.SubFactory(UserFactory)
+    created_at = factory.LazyFunction(timezone.now)
 
 
 def note_data_generator(note_type=None):
