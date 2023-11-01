@@ -61,6 +61,5 @@ def note_data_generator(note_type=None):
 def user_data_generator():
     user_obj = UserFactory.build()
     new_user_data = model_to_dict(user_obj)
-    new_user_data.pop('id')
     new_user_data.pop('last_login')
     return new_user_data

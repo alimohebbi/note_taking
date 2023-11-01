@@ -5,7 +5,7 @@ from .models import Note
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['title', 'content', 'id', 'remind_at', 'note_type', 'created_at']
+        fields = ['title', 'content', '_id', 'remind_at', 'note_type', 'created_at']
         extra_kwargs = {'user': {'required': False}}
 
     def validate_note_type(self, value):
@@ -18,4 +18,4 @@ class NoteSerializer(serializers.ModelSerializer):
 class ListNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['title', 'id', 'created_at']
+        fields = ['title', '_id', 'created_at']
