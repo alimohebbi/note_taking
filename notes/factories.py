@@ -25,6 +25,10 @@ class UserFactory(factory.django.DjangoModelFactory):
     password = factory.Faker('password')
     email = factory.Faker('email')
 
+    @factory.post_generation
+    def set_remind_at(obj, create, extracted, **kwargs):
+        obj.set_password(obj.password)
+
 
 class NoteFactory(factory.django.DjangoModelFactory):
     class Meta:
