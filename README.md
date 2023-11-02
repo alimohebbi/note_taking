@@ -1,4 +1,4 @@
-[![GitHub license](https://img.shields.io/github/license/alimohebbi/note_taking)](https://github.com/alimohebbi/note_taking/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub issues](https://img.shields.io/github/issues/alimohebbi/note_taking)](https://github.com/alimohebbi/note_taking/issues)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 ![Last Commit](https://img.shields.io/github/last-commit/alimohebbi/note_taking)
