@@ -1,11 +1,14 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from common.util import UrlSafeUUIDField
+
 User = get_user_model()
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    # user_id = UrlSafeUUIDField()
 
     class Meta:
         model = User

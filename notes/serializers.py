@@ -1,8 +1,12 @@
 from rest_framework import serializers
+
+from common.util import UrlSafeUUIDField
 from .models import Note, SharedNote
 
 
 class NoteSerializer(serializers.ModelSerializer):
+    # note_id = UrlSafeUUIDField()
+
     class Meta:
         model = Note
         fields = ['title', 'content', 'note_id', 'remind_at', 'note_type', 'created_at']
@@ -16,6 +20,8 @@ class NoteSerializer(serializers.ModelSerializer):
 
 
 class ListNoteSerializer(serializers.ModelSerializer):
+    # note_id = UrlSafeUUIDField()
+
     class Meta:
         model = Note
         fields = ['title', 'note_id', 'created_at']
@@ -26,7 +32,7 @@ class EmailSerializer(serializers.Serializer):
 
 
 class NoteIdSerializer(serializers.Serializer):
-    note_id = serializers.UUIDField()
+    note_id = serializers.CharField()
 
 
 class SharedNoteSerializer(serializers.ModelSerializer):

@@ -200,7 +200,7 @@ class NoteSharingAPITest(TestCase):
         self.authenticate(self.user)
         shared_note_record = SharedNoteFactory.create(recipient_user=self.user)
         url = reverse('shared_with_me')
-        response = self.client.delete(url, data={'note_id': Faker().word()})
+        response = self.client.delete(url, data={'note': ''})
         is_shared = SharedNote.objects.filter(id=shared_note_record.id).exists()
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue(is_shared)

@@ -1,3 +1,6 @@
+import base64
+import binascii
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
@@ -12,7 +15,7 @@ class Note(models.Model):
                  ('T', 'Thought'),
                  ('R', 'Reminder')]
 
-    note_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
+    _id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     note_type = models.CharField(max_length=1, choices=NOTE_TYPE, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
     title = models.CharField(max_length=200)
@@ -23,6 +26,18 @@ class Note(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_url_safe_uuid(self):
+        return base64.urlsafe_b64encode(self._id.bytes).rstrip(b'=').decode('utf-8')
+
+    def set_url_safe_uuid(self, url_safe_uuid):
+        try:
+            uuid_bytes = base64.urlsafe_b64decode(url_safe_uuid + '==')
+            self._id = uuid.UUID(bytes=uuid_bytes)
+        except (ValueError, TypeError, binascii.Error):
+            raise ValueError("Invalid URL-safe UUID format")
+
+    note_id = property(get_url_safe_uuid, set_url_safe_uuid)
 
 
 class SharedNote(models.Model):

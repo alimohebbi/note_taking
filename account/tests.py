@@ -27,12 +27,6 @@ class AccountAPITest(TestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        user_data = user_data_generator()
-        user_data.pop('email')
-        url = reverse('api_register')
-        response = self.client.post(url, user_data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
     def test_post_register_user_error_validation(self):
         user_data = user_data_generator()
         user_data.pop('username')

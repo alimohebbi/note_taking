@@ -1,3 +1,6 @@
+import base64
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -16,10 +19,18 @@ from notes.serializers import NoteSerializer, ListNoteSerializer, EmailSerialize
     NoteIdSerializer
 
 
+def convert_urls_safe_to_uuid(value):
+    try:
+        uuid_bytes = base64.urlsafe_b64decode(value + '==')
+        return uuid.UUID(bytes=uuid_bytes)
+    except:
+        Http404(NoteMessages.NOT_FOUND)
+
+
 def get_note_or_404(note_id) -> Note:
-    if not is_vali_uuid(note_id):
-        raise Http404(NoteMessages.NOT_FOUND)
-    return get_object_or_404(Note, pk=note_id)
+    actual_uuid = convert_urls_safe_to_uuid(note_id)
+    return get_object_or_404(Note, pk=actual_uuid)
+
 
 class NoteList(APIView):
     permission_classes = [IsAuthenticated]
@@ -99,8 +110,6 @@ class ShareNoteWithDetail(APIView):
             return Response(shared_note_serializer.data, status=status.HTTP_201_CREATED)
         return Response(email_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
     def delete(self, request, note_id):
         email_serializer = EmailSerializer(data=request.data)
 
@@ -128,7 +137,7 @@ class SharedNoteWithMeDetail(APIView):
     def delete(self, request):
         note_id_serializer = NoteIdSerializer(data=request.data)
         if note_id_serializer.is_valid():
-            note = get_object_or_404(Note, pk=note_id_serializer.data['note_id'])
+            note = get_note_or_404(note_id_serializer.data['note_id'])
             SharedNote.objects.filter(recipient_user=request.user, note=note).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(note_id_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
