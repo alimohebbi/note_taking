@@ -1,70 +1,110 @@
-# Note-Taking System
-[![GitHub stars](https://img.shields.io/github/stars/alimohebbi/note_taking)](https://github.com/alimohebbi/note_taking/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/alimohebbi/note_taking)](https://github.com/alimohebbi/note_taking/issues)
 [![GitHub license](https://img.shields.io/github/license/alimohebbi/note_taking)](https://github.com/alimohebbi/note_taking/blob/main/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/alimohebbi/note_taking)](https://github.com/alimohebbi/note_taking/issues)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![Last Commit](https://img.shields.io/github/last-commit/alimohebbi/note_taking)
+![Code Style](https://img.shields.io/badge/code%20style-PEP8-brightgreen)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/alimohebbi/note_taking)
 
-## Introduction
+## Note-Taking System Backend 
 
-This repository contains the code for a Note-Taking System, which allows users to manage their notes by providing functionalities to create, update, and delete notes. The system is implemented using the Python programming language and the Django framework. This README provides an overview of the design, implementation, and key features of the system.
+Welcome to the Note-Taking System repository! This project is an implementation of a note-taking system that allows
+users to manage their notes. Whether you want to jot down ideas, record thoughts, or set reminders, this system has got
+you covered. It was developed using the Python programming language and the Django framework. In this README, you'll
+find all the information you need to understand the design, implementation, and future scalability of the system.
 
 ## Table of Contents
 
 1. [Design and Implementation](#design-and-implementation)
     1. [Database Schema](#database-schema)
     2. [RESTful APIs](#restful-apis)
-    3. [Unit Testing (Bonus)](#unit-testing-bonus)
-2. [Design Decisions and Trade-offs](#design-decisions-and-trade-offs)
-3. [Version Control and Repository](#version-control-and-repository)
-4. [Conclusion](#conclusion)
+    3. [API Endpoints](#api-endpoints)
+2. [Unit Testing](#unit-testing)
+3. [Installation](#installation)
+4. [References](#references)
+
+
 
 ## Design and Implementation
 
 ### Database Schema
 
-The system's database schema is designed to efficiently support note-taking functionalities. It includes two primary tables:
+The system's database schema is designed to efficiently support note-taking functionalities. It includes two primary
+tables:
+
 - **User**: To store user information.
-  - Fields: id, username, email, password.
+    - Fields: id, username, email, password.
 - **Note**: To store the notes created by users.
-  - Fields: id, user id, title, description.
-  - Relationships: A foreign key relationship is established between the Note table and the User table, ensuring that each note is associated with a specific user.
-  - Constraints: Various constraints are applied to maintain data integrity.
+    - Fields: id, user_id, title, content, note_type, created_at, updated_at, remind_at.
+- **SharedNote** : To facilitate note-sharing between users.
+    - Fields: id, recipient_id, note_id, created_at.
 
 ### RESTful APIs
 
-RESTful APIs are implemented using the Python framework Django and Django REST framework. The following endpoints are provided:
+RESTful APIs have been implemented using the Python framework Django and Django REST framework. The APIs provide various
+functionalities, including note management, sharing, and user authentication.
 
-- Create Note
-- Read Note
-- Update Note
-- Delete Note
-- Read Notes List
-- Register
-- Login
-- Logout
+You can find the complete list of API endpoints in the [API Endpoints](#api-endpoints) section of this README. The APIs
+adhere to Microsoft API guidelines and offer validation, error handling, and performance optimizations.
 
-These APIs are designed for scalability, performance, and adhere to Microsoft API guidelines. Proper validation and informative error messages are provided for data integrity and reliability. Pagination is also implemented for optimized performance.
+## API Endpoints
 
-### Unit Testing (Bonus)
+The project offers the following API endpoints:
 
-Comprehensive unit tests are implemented using Django's testing framework, achieving 100% code coverage. These tests cover various use cases, input validation, and error handling. They ensure the reliability and maintainability of the system.
+| Functionality                              | HTTP Method | URL                                     |
+|--------------------------------------------|-------------|-----------------------------------------|
+| Create a note                              | POST        | /api/v1/notes/                          |
+| Read a note                                | GET         | /api/v1/notes/<note_id>/                |
+| Update a note                              | PUT         | /api/v1/notes/<note_id>/                |
+| Delete a note                              | DELETE      | /api/v1/notes/<note_id>/                |
+| Retrieve a list of notes                   | GET         | /api/v1/notes/                          |
+| Share a note with a user                   | POST        | /api/v1/notes/<note_id>/share-with/     |
+| Retrieve shared note recipients            | GET         | /api/v1/notes/<note_id>/share-with/     |
+| Stop sharing a note with a user            | DELETE      | /api/v1/notes/<note_id>/share-with      |
+| Retrieve shared notes for the current user | GET         | /api/v1/notes/shared-with-me/           |
+| Stop sharing a note with the current user  | DELETE      | /api/v1/notes/<note_id>/shared-with-me/ |
+| Register a user                            | POST        | /api/v1/account/register/               |
+| Log in                                     | POST        | /api/v1/account/login/                  |
+| Log out                                    | POST        | /api/v1/account/logout/                 |
 
-## Design Decisions and Trade-offs
+For more details, refer to the postman documentation of the end
+points [postman documentation](https://documenter.getpostman.com/view/1712946/2s9YXe6Nxx).
 
-- Feature Scope vs. Time to Market
-- Flexibility vs. Conformity (Authentication)
-- Flexibility vs. Conformity (RESTful implementation)
-- Scalability (SQL vs. NoSQL)
-- Scalability (Authentication)
+## Unit Testing
 
-## Version Control and Repository
+The project includes comprehensive unit tests covering various use cases, input validation, and error handling. These
+tests ensure the functionality and behavior of the implemented APIs. The unit tests have achieved 100% coverage and
+follow common conventions for API testing, enhancing code maintainability and readability.
 
-The codebase is version-controlled using Git, and the repository can be accessed on [GitHub](https://github.com/alimohebbi/note_taking).
+## Installation
 
-## Conclusion
+To run this backend on your local machine, follow these steps:
 
-The implementation of the Note-Taking System aligns with the specified requirements. The database schema is well-structured, and the RESTful APIs are designed for performance and maintainability. Comprehensive unit tests further ensure the reliability of the system.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/alimohebbi/note_taking.git
+   ```
 
-If you have any questions or need further information, please don't hesitate to reach out. Thank you for the opportunity to complete this task.
+2. Install the required dependencies using pip:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Apply database migrations:
+   ```bash
+   python manage.py migrate
+   ```
+
+4. Run Postgres data base using docker compose:
+   ```bash
+   docker-compose -f postgresql-compose.yml up    
+   ```
+
+5. Start the development server:
+   ```bash
+   python manage.py runserver
+   ```
+
+Your backend will be running at `http://127.0.0.1:8000/`.
 
 ## References
 
@@ -72,54 +112,3 @@ If you have any questions or need further information, please don't hesitate to 
 - [Microsoft API Guidelines](https://github.com/microsoft/api-guidelines)
 - [Postman](https://www.postman.com)
 
-
-### RESTful APIs
-
-RESTful APIs are implemented using the Python framework Django and Django REST framework. The following endpoints are provided:
-
-- **Create Note**
-  - HTTP Method: POST
-  - URL: `/api/v1/notes/`
-
-- **Read Note**
-  - HTTP Method: GET
-  - URL: `/api/v1/notes/{note_id}/`
-
-- **Update Note**
-  - HTTP Method: PUT
-  - URL: `/api/v1/notes/{note_id}/`
-
-- **Delete Note**
-  - HTTP Method: DELETE
-  - URL: `/api/v1/notes/{note_id}/`
-
-- **Read Notes List**
-  - HTTP Method: GET
-  - URL: `/api/v1/notes/?page={page}&page size={limit}`
-
-- **Register**
-  - HTTP Method: POST
-  - URL: `/api/v1/account/register/`
-
-- **Login**
-  - HTTP Method: POST
-  - URL: `/api/v1/account/login/`
-
-- **Logout**
-  - HTTP Method: POST
-  - URL: `/api/v1/account/logout/`
-
-These APIs are designed for scalability, performance, and adhere to Microsoft API guidelines. Proper validation and informative error messages are provided for data integrity and reliability. Pagination is also implemented for optimized performance.
-
-### RESTful APIs
-
-The system provides the following RESTful APIs:
-
-1. **Create Note** (POST /api/v1/notes/)
-   - JSON Input Example:
-   ```json
-   {
-     "user_id": 1,
-     "title": "Sample Note",
-     "description": "This is a sample note."
-   }
