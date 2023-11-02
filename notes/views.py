@@ -124,7 +124,7 @@ class ShareNoteWithDetail(APIView):
         return Response(email_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SharedNoteWithMeDetail(APIView):
+class SharedNoteWithMeGet(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -134,10 +134,11 @@ class SharedNoteWithMeDetail(APIView):
         serializer = ListNoteSerializer(paginated_query, many=True)
         return Response(paginator.get_paginated_response(serializer.data))
 
-    def delete(self, request):
-        note_id_serializer = NoteIdSerializer(data=request.data)
-        if note_id_serializer.is_valid():
-            note = get_note_or_404(note_id_serializer.data['note_id'])
-            SharedNote.objects.filter(recipient_user=request.user, note=note).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(note_id_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SharedNoteWithMeDelete(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, note_id):
+        note = get_note_or_404(note_id)
+        SharedNote.objects.filter(recipient_user=request.user, note=note).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -168,39 +168,31 @@ class NoteSharingAPITest(TestCase):
     def test_get_shared_with_curren_user_note_list_successful(self):
         self.authenticate(self.user)
         SharedNoteFactory.create_batch(size=OBJECTS_BATCH_SIZE, recipient_user=self.user)
-        url = reverse('shared_with_me') + PAGINATION_PARAM
+        url = reverse('shared_with_me_get') + PAGINATION_PARAM
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 8)
 
     def test_get_shared_with_current_user_note_list_unauthorized_error(self):
         SharedNoteFactory.create_batch(size=OBJECTS_BATCH_SIZE, recipient_user=self.user)
-        url = reverse('shared_with_me') + PAGINATION_PARAM
+        url = reverse('shared_with_me_get') + PAGINATION_PARAM
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_shared_with_user_note_successful(self):
         self.authenticate(self.user)
         shared_note_record = SharedNoteFactory.create(recipient_user=self.user)
-        url = reverse('shared_with_me')
-        response = self.client.delete(url, data={'note_id': shared_note_record.note.note_id})
+        url = reverse('shared_with_me_delete', args=[shared_note_record.note.note_id])
+        response = self.client.delete(url)
         is_shared = SharedNote.objects.filter(id=shared_note_record.id).exists()
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertTrue(not is_shared)
 
-    def test_delete_shared_with_user_error_unautorizerd(self):
+    def test_delete_shared_with_user_error_unauthorized(self):
         shared_note_record = SharedNoteFactory.create(recipient_user=self.user)
-        url = reverse('shared_with_me')
-        response = self.client.delete(url, data={'note_id': shared_note_record.note.note_id})
+        url = reverse('shared_with_me_delete', args=[shared_note_record.note.note_id])
+        response = self.client.delete(url)
         is_shared = SharedNote.objects.filter(id=shared_note_record.id).exists()
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertTrue(is_shared)
 
-    def test_delete_shared_with_user_error_validation(self):
-        self.authenticate(self.user)
-        shared_note_record = SharedNoteFactory.create(recipient_user=self.user)
-        url = reverse('shared_with_me')
-        response = self.client.delete(url, data={'note': ''})
-        is_shared = SharedNote.objects.filter(id=shared_note_record.id).exists()
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertTrue(is_shared)
