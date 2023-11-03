@@ -37,8 +37,8 @@ class Command(BaseCommand):
         highly_received = UserFactory.create()
         SharedNoteFactory.create_batch(size=batch_size, recipient_user=highly_received)
 
-        message = f'Pro writer User is {self.get_user_dict(highly_shared.user)} \n'
-        message += f'Pro shared note is { {"note_id": highly_shared.note_id}}\n'
-        message += f'Pro write is {self.get_user_dict(highly_received)}\n'
+        message = f'\nPro writer User is:\n {self.get_user_dict(highly_shared.user)} \n\n'
+        message += f'Pro shared Note is:\n { {"note_id": highly_shared.note_id}}\n\n'
+        message += f'Pro recipient User is:\n {self.get_user_dict(highly_received)}\n\n'
         self.stdout.write(self.style.SUCCESS(message))
 
